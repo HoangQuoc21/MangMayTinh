@@ -52,11 +52,11 @@ def handle(client, addr):
         request_url = request_line.split(' ')[1]
 
         #print(data)
-        print(request_line)
-        print(request_method)
-        print(request_url)
+        print(f'Request line: {request_line}')
+        print(f'Request method: {request_method}')
+        print(f'Request url: {request_url}')
         
-        #Xử lý các kiểu dữ liệu trả về nếu method là GET:
+        #Nếu method nhận được là GET: 
         if request_method == 'GET':
             if request_url == '/' or request_url == '/index.html':
                 url = 'D:/Github/MangMayTinh/SocketProject/index.html'
@@ -100,6 +100,10 @@ def handle(client, addr):
                 
             #Gửi nội dung data đã đọc lại cho client
             client.send(sendBackData)
+            print('\n')
+            
+        #Nếu method nhận được là POST: 
+        
         
         #Đóng Kết Nối Client
         client.close()
