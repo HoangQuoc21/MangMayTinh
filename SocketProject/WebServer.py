@@ -1,5 +1,6 @@
 #Thêm Thư Viện Để Sử Dụng Các Hàm Liên Quan
 import socket 
+#Thêm Thư Viện Threading (Đa luồng) để xử lý nhiều Client Connection đến Server cùng 1 lúc
 import threading
 # import error là thư viện chứa các lỗi có thể xảy ra khi lập trình 
 from os import error
@@ -51,10 +52,10 @@ def handle(client, addr):
         request_method = request_line.split(' ')[0]
         request_url = request_line.split(' ')[1]
 
-        #print(data)
-        print(f'Request line: {request_line}')
-        print(f'Request method: {request_method}')
-        print(f'Request url: {request_url}')
+        #print(f'-Data: \n{data}')
+        print(f'-Request line: {request_line}')
+        print(f'-Request method: {request_method}')
+        print(f'-Request url: {request_url}\n')
         
         #Nếu method nhận được là GET: 
         if request_method == 'GET':
@@ -100,7 +101,6 @@ def handle(client, addr):
                 
             #Gửi nội dung data đã đọc lại cho client
             client.send(sendBackData)
-            print('\n')
             
         #Nếu method nhận được là POST: 
         
@@ -110,15 +110,15 @@ def handle(client, addr):
         break
 
 #Cho Mở Kết Nối Server Để Lắng Nghe Kết Nối Từ Client
-def start():
+def start_server():
     SERVER.listen()
     while True:
         #Chấp nhận Kết Nối từ Client 
         conn, addr = SERVER.accept()
-        #Thread dùng để xử lý nhiều request trong 1 kết nối
+        #Thread dùng để xử lý nhiều connection cùng 1 lúc
         thread = threading.Thread(target= handle, args=(conn, addr))
         thread.start()
     
     
 if __name__ == '__main__':
-    start()
+    start_server()
