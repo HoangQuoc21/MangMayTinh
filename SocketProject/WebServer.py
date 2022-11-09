@@ -17,7 +17,7 @@ SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     SERVER.bind((HOST,PORT))
     #In lên Terminal xem WebServer đang chạy tại địa chỉ nào
-    print(f'\n* Server running on http://{HOST}:{PORT} *\n')
+    print(f'\n* Server running on http://{HOST}:{PORT} *')
     #Nếu socket gặp lỗi thì sẽ báo lên terminal: 
 except socket.error as e:
     print(f'Socket error: {e}\n')
@@ -25,9 +25,11 @@ except socket.error as e:
     
 def http_header(header_type):
     if header_type == '200':
-        header = 'HTTP/1.1 200 OK\n'
+        header = 'HTTP/1.1 200 OK\r\n'
     elif header_type == '404':
-        header = 'HTTP/1.0 404 page not found\n'
+        header = 'HTTP/1.0 404 page not found\r\n'
+    elif header_type == '401':
+        header = 'HTTP/1.1 401 Unauthorized\r\n'
     return header
 
 #Hàm trả về response_header tương ứng với từng loại content_type
@@ -57,67 +59,65 @@ def handle(client, addr):
         #Phân tích Request Từ Data nhận về
         request_line = data.split('\r\n')[0]
         request_method = request_line.split(' ')[0]
-        request_url = request_line.split(' ')[1]
+        request_url = (request_line.split(' ')[1]).strip('/')
 
-        #print(f'-Data: \n{data}')
-        print(f'-Request line: {request_line}')
+        print(f'-Data: \n{data}')
+        print(f'\n-Request line: {request_line}')
         print(f'-Request method: {request_method}')
-        print(f'-Request url: {request_url}\n')
+        print(f'-Request url: {request_url}')
         
         # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
         #Nếu method nhận được là GET: 
         if request_method == 'GET':
-            if request_url == '/' or request_url == '/index.html':
+            if request_url == '' or request_url == 'index.html':
                 url = 'D:/Github/MangMayTinh/SocketProject/index.html'
                 Content_type = 'text/html'
                 header_type = '200'
-                #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)   
-                sendBackData = read_file(url,header_type, Content_type)
-            elif request_url == '/css/style.css':
+            elif request_url == 'css/style.css':
                 url = 'D:/Github/MangMayTinh/SocketProject/css/style.css'
                 Content_type = 'text/css'
                 header_type = '200'
-                #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)   
-                sendBackData = read_file(url,header_type, Content_type)
-            elif request_url == '/favicon.ico':
+            elif request_url == 'favicon.ico':
                 url = 'D:/Github/MangMayTinh/SocketProject/favicon.ico'
                 Content_type = 'image/x-icon'
                 header_type = '200'
-                sendBackData = read_file(url,header_type, Content_type)
-            elif(request_url.split('/')[1] == 'avatars'): 
-                if request_url == '/avatars/1.png':
+            elif(request_url.split('/')[0] == 'avatars'): 
+                if request_url == 'avatars/1.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/1.png'
-                elif request_url == '/avatars/2.png':
+                elif request_url == 'avatars/2.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/2.png'
-                elif request_url == '/avatars/3.png':
+                elif request_url == 'avatars/3.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/3.png'
-                elif request_url == '/avatars/4.png':
+                elif request_url == 'avatars/4.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/4.png'
-                elif request_url == '/avatars/5.png':
+                elif request_url == 'avatars/5.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/5.png'
-                elif request_url == '/avatars/6.png':
+                elif request_url == 'avatars/6.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/6.png'
-                elif request_url == '/avatars/7.png':
+                elif request_url == 'avatars/7.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/7.png'
-                elif request_url == '/avatars/8.png':
+                elif request_url == 'avatars/8.png':
                     url = 'D:/Github/MangMayTinh/SocketProject/avatars/8.png'
                 header_type = '200'
-                Content_type = 'image/png'
-                #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)   
-                sendBackData = read_file(url,header_type, Content_type)
+                Content_type = 'image/png' 
             else:
                 # == 4. LỖI PAGE ==
                 #Nếu Load Page Không Đúng Thì Trả Về 404.html
                 header_type = '404'
                 url = 'D:/Github/MangMayTinh/SocketProject/404.html'
                 Content_type = 'text/html'
-                sendBackData = read_file(url,header_type, Content_type)
-                
+                print('* 404: File not found *')
+            #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
+            sendBackData = read_file(url,header_type, Content_type)
             #Gửi nội dung data đã đọc lại cho client
             client.send(sendBackData)
             
+        # == 4. ĐĂNG NHẬP ==
         #Nếu method nhận được là POST: 
-        
+        if request_method == 'POST':
+            user_name = data.split('&')[0]
+            password = data.split('&')[1]
+            print (user_name, password)
         
         #Đóng Kết Nối Client
         client.close()
