@@ -106,7 +106,6 @@ def handle(client, addr):
         if request_method == 'POST':
             #Tách chuỗi uname và psw từ data
             login_line = data.split('uname')[1]
-            print(data)
 
             #Tách lấy riêng uname và psw
                 #Tách lấy user_name
@@ -134,16 +133,17 @@ def handle(client, addr):
             print("\n") 
         
         #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
-        sendBackData = read_file(url,header_type, Content_type)
+        send_Back_Data = read_file(url,header_type, Content_type)
         
         #Gửi nội dung data đã đọc lại cho client
-        client.send(sendBackData)
+        client.send(send_Back_Data)
          
         #Đóng Kết Nối Client
         client.close()
         break
 
 # == 1. KẾT NỐI == 
+# == 2. QUẢN LÝ KẾT NỐI. ==
 #Cho Mở Kết Nối Server Để Lắng Nghe Kết Nối Từ Client
 def start_server():
     #Đợi kết nối từ Client
@@ -154,8 +154,7 @@ def start_server():
         # == 6. MULTIPLE REQUESTS. ==
         #Chấp nhận Kết Nối từ Client 
         connection, address = SERVER.accept()
-        
-        # == 2. QUẢN LÝ KẾT NỐI. ==
+
         #Thread dùng để xử lý nhiều connection cùng 1 lúc
         thread = threading.Thread(target= handle, args=(connection, address))
         thread.start()
