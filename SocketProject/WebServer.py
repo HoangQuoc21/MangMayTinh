@@ -114,10 +114,7 @@ def handle(client, addr):
             
         # == 4. ĐĂNG NHẬP ==
         #Nếu method nhận được là POST: 
-        if request_method == 'POST':
-            user_name = data.split('&')[0]
-            password = data.split('&')[1]
-            print (user_name, password)
+        
         
         #Đóng Kết Nối Client
         client.close()
