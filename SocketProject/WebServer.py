@@ -77,19 +77,19 @@ def handle(client, addr):
                 Content_type = 'text/html'
                 header_type = '200'
             elif request_url == 'css/style.css':
-                url = file_path + '' + request_url
+                url = file_path + request_url
                 Content_type = 'text/css'
                 header_type = '200'
             elif request_url == 'favicon.ico':
-                url = file_path + '' + request_url
+                url = file_path + request_url
                 Content_type = 'image/x-icon'
                 header_type = '200'
             elif(request_url.split('/')[0] == 'images'):
-                url = file_path + '' + request_url
+                url = file_path + request_url
                 header_type = '200'
                 Content_type = 'image/jpeg' 
             elif(request_url.split('/')[0] == 'avatars'): 
-                url = file_path + '' + request_url
+                url = file_path + request_url
                 header_type = '200'
                 Content_type = 'image/png' 
             else:
