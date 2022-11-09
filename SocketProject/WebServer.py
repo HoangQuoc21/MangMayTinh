@@ -102,7 +102,34 @@ def handle(client, addr):
             
         # == 4. ĐĂNG NHẬP ==
         #Nếu method nhận được là POST:
-        
+        if request_method == 'POST':
+            #Tách chuỗi uname và psw từ data
+            login_line = data.splitlines()[21]
+
+            #Tách lấy riêng uname và psw
+                #Tách lấy user_name
+            user_name=login_line.split('&')[0]
+            user_name=user_name.split('=')[1]
+                #Tách lấy password
+            password=login_line.split('&')[1]
+            password=password.split('=')[1]
+
+            print(f'    +User Name: {user_name}')
+            print(f'    +Password: {password}')
+
+            #Kiểm tra uname và pws nếu đúng trả về images.html, nếu sai trả về 401.html
+            if user_name == "admin" and password == "123456":
+                url = 'D:/Github/MangMayTinh/SocketProject/images.html' 
+                Content_type = 'text/html'
+                header_type = '200'
+                print('-Signed In Successfully.')
+            else:
+                #Nếu Đăng Nhập Không Đúng Thì Trả Về 401.html
+                header_type = '404'
+                url = 'D:/Github/MangMayTinh/SocketProject/401.html'
+                Content_type = 'text/html'
+                print('* Error 401: Unauthorized *')
+            print("\n") 
         
         #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
         sendBackData = read_file(url,header_type, Content_type)
