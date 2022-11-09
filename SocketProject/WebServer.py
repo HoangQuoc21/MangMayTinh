@@ -12,7 +12,6 @@ PORT = 8080
 #Tạo Socket Server với dạng địa chỉ IPv4 và giao thức TCP/IP (Có Kết Nối)
 SERVER = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-
 #Bind Server Socket đã tạo ở trên lên, Nếu lỗi thì in thông báo ra ternimal 
 try:
     SERVER.bind((HOST,PORT))
@@ -35,14 +34,16 @@ def http_header(header_type):
 #Hàm trả về response_header tương ứng với từng loại content_type
 def response_header(header_type, Content_type):
     message_header = http_header(header_type)
-    message_header += f'Content-type: {Content_type}'
-    message_header += '\r\n\r\n'
+    message_header += f'Content-type: {Content_type}\r\n'
+    message_header += 'Connection: closed\r\n'
+    message_header += '\r\n'
     message_header = message_header.encode()
     return message_header
 
-#Hàm đọc nội dung file và chuyển data đã đọc về dưới dạng nhị phân (byte)
+#Hàm đọc nội dung file và chuyển data đã đọc về dưới dạng nhị phân (byte)(có http header ở trước nội dung)
 def read_file(file_url, header_type, Content_type):
     f = open(file_url, 'rb')
+    # Gán http header vào trước nội dung file
     f_data = response_header(header_type, Content_type)
     f_data += f.read()
     return f_data
@@ -144,13 +145,16 @@ def handle(client, addr):
 # == 1. KẾT NỐI == 
 #Cho Mở Kết Nối Server Để Lắng Nghe Kết Nối Từ Client
 def start_server():
+    #Đợi kết nối từ Client
     SERVER.listen()
+
+    # == 7. MULTIPLE CONNECTIONS. ==
     while True:
-        # == 6. MULTIPLE REQUESTS
+        # == 6. MULTIPLE REQUESTS. ==
         #Chấp nhận Kết Nối từ Client 
         connection, address = SERVER.accept()
         
-        # == 7. MULTIPLE CONNECTIONS ==
+        # == 2. QUẢN LÝ KẾT NỐI. ==
         #Thread dùng để xử lý nhiều connection cùng 1 lúc
         thread = threading.Thread(target= handle, args=(connection, address))
         thread.start()
