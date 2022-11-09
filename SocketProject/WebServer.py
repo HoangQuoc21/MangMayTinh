@@ -20,8 +20,7 @@ try:
     print(f'\n* Server running on http://{HOST}:{PORT} *\n')
     #Nếu socket gặp lỗi thì sẽ báo lên terminal: 
 except socket.error as e:
-    print(f'Socket error: {e}\n')
-    print('Socket error: %s\n' %(e))
+    print(f'-Socket error: {e}\n')
     
 #Hàm trả về http_header (Thông tin trong response_header) cho từng loại header_type tương ứng
 def http_header(header_type):
@@ -69,33 +68,34 @@ def handle(client, addr):
         
         # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
         #Nếu method nhận được là GET: 
+        file_path = 'D:/Github/MangMayTinh/SocketProject/'
         if request_method == 'GET':
             #Với mỗi loại request_url ( loại file cần đọc), cần trả về các thông tin url (đường dẫn file); content_type và header_type tương ứng
             if request_url == '' or request_url == 'index.html':
-                url = 'D:/Github/MangMayTinh/SocketProject/index.html' 
+                url = file_path + 'index.html'
                 Content_type = 'text/html'
                 header_type = '200'
             elif request_url == 'css/style.css':
-                url = 'D:/Github/MangMayTinh/SocketProject/' + request_url
+                url = file_path + '' + request_url
                 Content_type = 'text/css'
                 header_type = '200'
             elif request_url == 'favicon.ico':
-                url = 'D:/Github/MangMayTinh/SocketProject/' + request_url
+                url = file_path + '' + request_url
                 Content_type = 'image/x-icon'
                 header_type = '200'
             elif(request_url.split('/')[0] == 'images'):
-                url = 'D:/Github/MangMayTinh/SocketProject/' + request_url
+                url = file_path + '' + request_url
                 header_type = '200'
                 Content_type = 'image/jpeg' 
             elif(request_url.split('/')[0] == 'avatars'): 
-                url = 'D:/Github/MangMayTinh/SocketProject/' + request_url
+                url = file_path + '' + request_url
                 header_type = '200'
                 Content_type = 'image/png' 
             else:
                 # == 4. LỖI PAGE ==
                 #Nếu Load Page Không Đúng Thì Trả Về 404.html
                 header_type = '404'
-                url = 'D:/Github/MangMayTinh/SocketProject/404.html'
+                url = file_path + '404.html'
                 Content_type = 'text/html'
                 print('* Error 404: File not found *')
             print("\n") 
@@ -119,14 +119,14 @@ def handle(client, addr):
 
             #Kiểm tra uname và pws nếu đúng trả về images.html, nếu sai trả về 401.html
             if user_name == "admin" and password == "123456":
-                url = 'D:/Github/MangMayTinh/SocketProject/images.html' 
+                url = file_path + 'images.html' 
                 Content_type = 'text/html'
                 header_type = '200'
                 print('-Signed In Successfully.')
             else:
                 #Nếu Đăng Nhập Không Đúng Thì Trả Về 401.html
                 header_type = '404'
-                url = 'D:/Github/MangMayTinh/SocketProject/401.html'
+                url = file_path + '401.html'
                 Content_type = 'text/html'
                 print('* Error 401: Unauthorized *')
             print("\n") 
@@ -148,11 +148,11 @@ def start_server():
     while True:
         # == 6. MULTIPLE REQUESTS
         #Chấp nhận Kết Nối từ Client 
-        conn, addr = SERVER.accept()
+        connection, address = SERVER.accept()
         
         # == 7. MULTIPLE CONNECTIONS ==
         #Thread dùng để xử lý nhiều connection cùng 1 lúc
-        thread = threading.Thread(target= handle, args=(conn, addr))
+        thread = threading.Thread(target= handle, args=(connection, address))
         thread.start()
     
     
