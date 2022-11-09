@@ -105,7 +105,8 @@ def handle(client, addr):
         #Nếu method nhận được là POST:
         if request_method == 'POST':
             #Tách chuỗi uname và psw từ data
-            login_line = data.splitlines()[21]
+            login_line = data.split('uname')[1]
+            print(data)
 
             #Tách lấy riêng uname và psw
                 #Tách lấy user_name
