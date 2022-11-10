@@ -19,7 +19,7 @@ try:
     print(f'\n* Server running on http://{HOST}:{PORT} *\n')
     #Nếu socket gặp lỗi thì sẽ báo lên terminal: 
 except socket.error as e:
-    print(f'-Socket error: {e}\n')
+    print(f'\n-Socket error: {e}\n')
     
 #Hàm trả về http_header (Thông tin trong response_header) cho từng loại header_type tương ứng
 def http_header(header_type):
@@ -63,7 +63,7 @@ def handle(client, addr):
         request_url = (request_line.split(' ')[1]).strip('/')
 
         #print(f'-Data: \n{data}')
-        print(f'\n-Request line: {request_line}')
+        print(f'-Request line: {request_line}')
         print(f'-Request method: {request_method}')
         print(f'-Request url: {request_url}')
         
@@ -76,7 +76,7 @@ def handle(client, addr):
                 url = file_path + 'index.html'
                 Content_type = 'text/html'
                 header_type = '200'
-            elif request_url == 'css/style.css':
+            elif (request_url.split('/')[0] == 'css'):
                 url = file_path + request_url
                 Content_type = 'text/css'
                 header_type = '200'
@@ -99,7 +99,6 @@ def handle(client, addr):
                 url = file_path + '404.html'
                 Content_type = 'text/html'
                 print('* Error 404: File not found *')
-            print("\n") 
             
         # == 4. ĐĂNG NHẬP ==
         #Nếu method nhận được là POST:
@@ -130,7 +129,8 @@ def handle(client, addr):
                 url = file_path + '401.html'
                 Content_type = 'text/html'
                 print('* Error 401: Unauthorized *')
-            print("\n") 
+            
+        print("\n") 
         
         #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
         send_Back_Data = read_file(url,header_type, Content_type)
