@@ -2,8 +2,9 @@
 import socket 
 #Thêm Thư Viện Threading (Đa luồng) để xử lý nhiều Client Connection đến Server cùng 1 lúc
 import threading
-# import error là thư viện chứa các lỗi có thể xảy ra khi lập trình 
-from os import error
+# import os là thư viện chứa các lỗi có thể xảy ra khi lập trình và tìm đường dẫn thư mục đang làm việc hiện tại 
+import os
+
 
 #Khai báo thông tin của Host address và Port Sử Dụng
 HOST = '127.0.0.1'
@@ -68,8 +69,11 @@ def handle(client, addr):
         print(f'-Request url: {request_url}')
         
         # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
-        #Nếu method nhận được là GET: 
-        file_path = 'D:/Github/MangMayTinh/SocketProject/'
+
+        #nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
+        file_path=os.path.dirname(__file__)
+        file_path=file_path.replace("\\",'/') + '/'
+        #Nếu method nhận được là GET:      
         if request_method == 'GET':
             #Với mỗi loại request_url ( loại file cần đọc), cần trả về các thông tin url (đường dẫn file); content_type và header_type tương ứng
             if request_url == '' or request_url == 'index.html':
