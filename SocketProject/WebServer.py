@@ -70,9 +70,10 @@ def handle(client, addr):
         
         # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
 
-        #nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
+        #Nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
         file_path=os.path.dirname(__file__)
         file_path=file_path.replace("\\",'/') + '/'
+        print('Absolute directoryname: ', file_path)
         #Nếu method nhận được là GET:      
         if request_method == 'GET':
             #Với mỗi loại request_url ( loại file cần đọc), cần trả về các thông tin url (đường dẫn file); content_type và header_type tương ứng
