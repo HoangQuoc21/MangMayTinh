@@ -22,6 +22,12 @@ try:
 except socket.error as e:
     print(f'\n-Socket error: {e}\n')
     
+#Hàm lấy kích thước bytes của file
+def get_size(file_name):
+    file_name.seek(0,2) # move the cursor to the end of the file
+    size = file_name.tell()
+    return size  
+
 #Hàm trả về http_header (Thông tin trong response_header) cho từng loại header_type tương ứng
 def http_header(header_type):
     if header_type == '200':
@@ -33,19 +39,20 @@ def http_header(header_type):
     return header
 
 #Hàm trả về response_header tương ứng với từng loại content_type
-def response_header(header_type, Content_type):
+def response_header(header_type, Content_type, file_size):
     message_header = http_header(header_type)
     message_header += f'Content-type: {Content_type}\r\n'
     message_header += 'Connection: closed\r\n'
+    message_header += f'Content-Length: {file_size}\r\n'
     message_header += '\r\n'
     message_header = message_header.encode()
     return message_header
 
 #Hàm đọc nội dung file và chuyển data đã đọc về dưới dạng nhị phân (byte)(có http header ở trước nội dung)
-def read_file(file_url, header_type, Content_type):
+def read_file(file_url, header_type, Content_type, file_size):
     f = open(file_url, 'rb')
     # Gán http header vào trước nội dung file
-    f_data = response_header(header_type, Content_type)
+    f_data = response_header(header_type, Content_type, file_size)
     f_data += f.read()
     f.close()
     return f_data
@@ -74,7 +81,7 @@ def handle(client, addr):
     #Nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
     file_path=os.path.dirname(__file__)
     file_path=file_path.replace("\\",'/') + '/'
-    print('Absolute directoryname: ', file_path)
+    print('-Absolute directory name: ', file_path)
     
     #Nếu method nhận được là GET:      
     if request_method == 'GET':
@@ -137,10 +144,11 @@ def handle(client, addr):
             Content_type = 'text/html'
             print('* Error 401: Unauthorized *')
         
-    print("\n") 
+    file_size = get_size(open(url,'rb'))
+    print(f'-File size: {file_size}\n')
     
     #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
-    send_Back_Data = read_file(url,header_type, Content_type)
+    send_Back_Data = read_file(url,header_type, Content_type, file_size)
     
     #Gửi nội dung data đã đọc lại cho client
     client.send(send_Back_Data)
