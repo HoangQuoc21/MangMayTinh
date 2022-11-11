@@ -47,6 +47,7 @@ def read_file(file_url, header_type, Content_type):
     # Gán http header vào trước nội dung file
     f_data = response_header(header_type, Content_type)
     f_data += f.read()
+    f.close()
     return f_data
 
 
