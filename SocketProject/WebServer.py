@@ -1,8 +1,8 @@
-#Thêm Thư Viện Để Sử Dụng Các Hàm Liên Quan
+#Import thư viện socket để sử dụng các hàm liên quan đến socket (listen(), accept(), close()....)
 import socket 
-#Thêm Thư Viện Threading (Đa luồng) để xử lý nhiều Client Connection đến Server cùng 1 lúc
+#Import thư viện Threading (Đa luồng) để xử lý nhiều Client Connection đến Server cùng 1 lúc
 import threading
-# import os là thư viện chứa các lỗi có thể xảy ra khi lập trình và tìm đường dẫn thư mục đang làm việc hiện tại 
+#Import thư viện os là thư viện chứa các lỗi có thể xảy ra khi lập trình và tìm đường dẫn thư mục đang làm việc hiện tại 
 import os
 
 
@@ -75,6 +75,7 @@ def handle(client, addr):
         file_path=os.path.dirname(__file__)
         file_path=file_path.replace("\\",'/') + '/'
         print('Absolute directoryname: ', file_path)
+        
         #Nếu method nhận được là GET:      
         if request_method == 'GET':
             #Với mỗi loại request_url ( loại file cần đọc), cần trả về các thông tin url (đường dẫn file); content_type và header_type tương ứng
