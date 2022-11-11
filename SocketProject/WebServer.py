@@ -53,101 +53,100 @@ def read_file(file_url, header_type, Content_type):
 
 #Hàm handle để xử lý Request từ Client. Parse Request Và Gửi Trả Data về
 def handle(client, addr):
-    while True:
-        #Nhận data là Request từ Client
-        data = client.recv(1024).decode()
-        #Nếu không có data thì thoát khỏi vòng lặp
-        if not data: break
-        
-        #Phân tích Request Từ Data nhận về
-        request_line = data.split('\r\n')[0]
-        request_method = request_line.split(' ')[0]
-        request_url = (request_line.split(' ')[1]).strip('/')
+    
+    #Nhận data là Request từ Client
+    data = client.recv(1024).decode()
+    #Nếu không có data thì thoát khỏi hàm (không xử lý tiếp nữa)
+    if not data: return
+    
+    # Nếu có data thì phân tích Request Từ Data nhận về
+    request_line = data.split('\r\n')[0]
+    request_method = request_line.split(' ')[0]
+    request_url = (request_line.split(' ')[1]).strip('/')
 
-        #print(f'-Data: \n{data}')
-        print(f'-Request line: {request_line}')
-        print(f'-Request method: {request_method}')
-        print(f'-Request url: {request_url}')
-        
-        # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
+    #print(f'-Data: \n{data}')
+    print(f'-Request line: {request_line}')
+    print(f'-Request method: {request_method}')
+    print(f'-Request url: {request_url}')
+    
+    # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
 
-        #Nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
-        file_path=os.path.dirname(__file__)
-        file_path=file_path.replace("\\",'/') + '/'
-        print('Absolute directoryname: ', file_path)
+    #Nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
+    file_path=os.path.dirname(__file__)
+    file_path=file_path.replace("\\",'/') + '/'
+    print('Absolute directoryname: ', file_path)
+    
+    #Nếu method nhận được là GET:      
+    if request_method == 'GET':
+        #Với mỗi loại request_url ( loại file cần đọc), cần trả về các thông tin url (đường dẫn file); content_type và header_type tương ứng
+        if request_url == '' or request_url == 'index.html':
+            url = file_path + 'index.html'
+            Content_type = 'text/html'
+            header_type = '200'
+        elif (request_url.split('/')[0] == 'css'):
+            url = file_path + request_url
+            Content_type = 'text/css'
+            header_type = '200'
+        elif request_url == 'favicon.ico':
+            url = file_path + request_url
+            Content_type = 'image/x-icon'
+            header_type = '200'
+        elif(request_url.split('/')[0] == 'images'):
+            url = file_path + request_url
+            header_type = '200'
+            Content_type = 'image/jpeg' 
+        elif(request_url.split('/')[0] == 'avatars'): 
+            url = file_path + request_url
+            header_type = '200'
+            Content_type = 'image/png' 
+        else:
+            # == 4. LỖI PAGE ==
+            #Nếu Load Page Không Đúng Thì Trả Về 404.html
+            header_type = '404'
+            url = file_path + '404.html'
+            Content_type = 'text/html'
+            print('* Error 404: File not found *')
         
-        #Nếu method nhận được là GET:      
-        if request_method == 'GET':
-            #Với mỗi loại request_url ( loại file cần đọc), cần trả về các thông tin url (đường dẫn file); content_type và header_type tương ứng
-            if request_url == '' or request_url == 'index.html':
-                url = file_path + 'index.html'
-                Content_type = 'text/html'
-                header_type = '200'
-            elif (request_url.split('/')[0] == 'css'):
-                url = file_path + request_url
-                Content_type = 'text/css'
-                header_type = '200'
-            elif request_url == 'favicon.ico':
-                url = file_path + request_url
-                Content_type = 'image/x-icon'
-                header_type = '200'
-            elif(request_url.split('/')[0] == 'images'):
-                url = file_path + request_url
-                header_type = '200'
-                Content_type = 'image/jpeg' 
-            elif(request_url.split('/')[0] == 'avatars'): 
-                url = file_path + request_url
-                header_type = '200'
-                Content_type = 'image/png' 
-            else:
-                # == 4. LỖI PAGE ==
-                #Nếu Load Page Không Đúng Thì Trả Về 404.html
-                header_type = '404'
-                url = file_path + '404.html'
-                Content_type = 'text/html'
-                print('* Error 404: File not found *')
-            
-        # == 4. ĐĂNG NHẬP ==
-        #Nếu method nhận được là POST:
-        if request_method == 'POST':
-            #Tách chuỗi uname và psw từ data
-            login_line = data.split('uname')[1]
+    # == 4. ĐĂNG NHẬP ==
+    #Nếu method nhận được là POST:
+    if request_method == 'POST':
+        #Tách chuỗi uname và psw từ data
+        login_line = data.split('uname')[1]
 
-            #Tách lấy riêng uname và psw
-                #Tách lấy user_name
-            user_name=login_line.split('&')[0]
-            user_name=user_name.split('=')[1]
-                #Tách lấy password
-            password=login_line.split('&')[1]
-            password=password.split('=')[1]
+        #Tách lấy riêng uname và psw
+            #Tách lấy user_name
+        user_name=login_line.split('&')[0]
+        user_name=user_name.split('=')[1]
+            #Tách lấy password
+        password=login_line.split('&')[1]
+        password=password.split('=')[1]
 
-            print(f'    +User Name: {user_name}')
-            print(f'    +Password: {password}')
+        print(f'    +User Name: {user_name}')
+        print(f'    +Password: {password}')
 
-            #Kiểm tra uname và pws nếu đúng trả về images.html, nếu sai trả về 401.html
-            if user_name == "admin" and password == "123456":
-                url = file_path + 'images.html' 
-                Content_type = 'text/html'
-                header_type = '200'
-                print('-Signed In Successfully.')
-            else:
-                #Nếu Đăng Nhập Không Đúng Thì Trả Về 401.html
-                header_type = '404'
-                url = file_path + '401.html'
-                Content_type = 'text/html'
-                print('* Error 401: Unauthorized *')
-            
-        print("\n") 
+        #Kiểm tra uname và pws nếu đúng trả về images.html, nếu sai trả về 401.html
+        if user_name == "admin" and password == "123456":
+            url = file_path + 'images.html' 
+            Content_type = 'text/html'
+            header_type = '200'
+            print('-Signed In Successfully.')
+        else:
+            #Nếu Đăng Nhập Không Đúng Thì Trả Về 401.html
+            header_type = '404'
+            url = file_path + '401.html'
+            Content_type = 'text/html'
+            print('* Error 401: Unauthorized *')
         
-        #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
-        send_Back_Data = read_file(url,header_type, Content_type)
+    print("\n") 
+    
+    #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
+    send_Back_Data = read_file(url,header_type, Content_type)
+    
+    #Gửi nội dung data đã đọc lại cho client
+    client.send(send_Back_Data)
         
-        #Gửi nội dung data đã đọc lại cho client
-        client.send(send_Back_Data)
-         
-        #Đóng Kết Nối Client
-        client.close()
-        break
+    #Đóng Kết Nối Client
+    client.close()
 
 # == 1. KẾT NỐI == 
 # == 2. QUẢN LÝ KẾT NỐI. ==
