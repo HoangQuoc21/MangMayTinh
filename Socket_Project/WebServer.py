@@ -80,17 +80,17 @@ def handle(client, addr):
         request_method = request_line.split(' ')[0]
         request_url = (request_line.split(' ')[1]).strip('/')
 
-        print(f'-Client: {addr}')
+        print(f'    -Client: {addr}')
         #print(f'-Data: \n{data}')
-        print(f'-Request line: {request_line}')
-        print(f'-Request method: {request_method}')
-        print(f'-Request url: {request_url}')
+        print(f'    -Request line: {request_line}')
+        print(f'    -Request method: {request_method}')
+        print(f'    -Request url: {request_url}')
         
         # == 3. TẢI ĐƯỢC PAGE INDEX.HTML == 
         #Nhận đường dẫn thư mục đang làm việc (Tức thư mục chứa các file cần đọc và send đến client)
         file_path=os.path.dirname(__file__)
         file_path=file_path.replace("\\",'/') + '/'
-        print('-Absolute directory name: ', file_path)
+        print('    -Absolute directory name: ', file_path)
         
         #Nếu method nhận được là GET:      
         if request_method == 'GET':
@@ -137,15 +137,15 @@ def handle(client, addr):
             password=login_line.split('&')[1]
             password=password.split('=')[1]
 
-            print(f'    +User Name: {user_name}')
-            print(f'    +Password: {password}')
+            print(f'        +User Name: {user_name}')
+            print(f'        +Password: {password}')
 
             #Kiểm tra uname và pws nếu đúng trả về images.html, nếu sai trả về 401.html
             if user_name == "admin" and password == "123456":
                 url = file_path + 'images.html' 
                 Content_type = 'text/html'
                 header_type = '200'
-                print('-Signed In Successfully.')
+                print('    -Signed In Successfully.')
             else:
                 #Nếu Đăng Nhập Không Đúng Thì Trả Về 401.html
                 header_type = '404'
@@ -155,13 +155,14 @@ def handle(client, addr):
         
         #Lấy kích thước file trả về    
         file_size = get_size(open(url,'rb'))
-        print(f'-File size: {file_size}\n')
+        print(f'    -File size: {file_size}\n')
         
         #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
         send_Back_Data = read_file(url,header_type, Content_type, file_size)
         
         #Gửi nội dung data đã đọc lại cho client
         client.send(send_Back_Data)
+        break
           
     #Đóng Kết Nối Client
     client.close()
