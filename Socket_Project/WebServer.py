@@ -162,8 +162,7 @@ def handle(client, addr):
         
         #Gửi nội dung data đã đọc lại cho client
         client.send(send_Back_Data)
-        break
-          
+        
     #Đóng Kết Nối Client
     client.close()
 
