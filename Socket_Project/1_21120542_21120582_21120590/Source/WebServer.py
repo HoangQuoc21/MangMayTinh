@@ -26,7 +26,7 @@ except socket.error as e:
     
 #Hàm lấy kích thước bytes của file
 def get_size(file_name):
-    file_name.seek(0,2) # move the cursor to the end of the file
+    file_name.seek(0,2) # đưa con trỏ tới cuối file
     size = file_name.tell()
     return size  
 
