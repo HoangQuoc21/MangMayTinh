@@ -28,6 +28,7 @@ except socket.error as e:
 def get_size(file_name):
     file_name.seek(0,2) # đưa con trỏ tới cuối file
     size = file_name.tell()
+    file_name.close()
     return size  
 
 #Hàm trả về http_header (Thông tin trong response_header) cho từng loại header_type tương ứng
@@ -44,7 +45,7 @@ def http_header(header_type):
 def response_header(header_type, Content_type, file_size):
     message_header = http_header(header_type)
     message_header += f'Content-type: {Content_type}\r\n'
-    message_header += 'Connection: closed\r\n'
+    message_header += 'Connection: close\r\n'
     message_header += f'Content-Length: {file_size}\r\n'
     message_header += '\r\n'
     message_header = message_header.encode()
