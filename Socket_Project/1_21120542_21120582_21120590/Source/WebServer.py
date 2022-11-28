@@ -1,5 +1,5 @@
 #Import thư viện socket để sử dụng các hàm liên quan đến socket (listen(), accept(), close()....)
-import socket 
+import socket
 #Import thư viện Threading (Đa luồng) để xử lý nhiều Client Connection đến Server cùng 1 lúc
 import threading
 #Import thư viện os là thư viện chứa các lỗi có thể xảy ra khi lập trình và tìm đường dẫn thư mục đang làm việc hiện tại 
@@ -26,7 +26,7 @@ except socket.error as e:
     
 #Hàm lấy kích thước bytes của file
 def get_size(file_name):
-    file_name.seek(0,2) # đưa con trỏ tới cuối file
+    file_name.seek(0,2) # move the cursor to the end of the file
     size = file_name.tell()
     file_name.close()
     return size  
@@ -42,20 +42,20 @@ def http_header(header_type):
     return header
 
 #Hàm trả về response_header tương ứng với từng loại content_type
-def response_header(header_type, Content_type, file_size):
+def response_header(header_type, Content_type, file_size, connection_type):
     message_header = http_header(header_type)
     message_header += f'Content-type: {Content_type}\r\n'
-    message_header += 'Connection: close\r\n'
+    message_header += f'Connection: {connection_type}\r\n'
     message_header += f'Content-Length: {file_size}\r\n'
     message_header += '\r\n'
     message_header = message_header.encode()
     return message_header
 
 #Hàm đọc nội dung file và chuyển data đã đọc về dưới dạng nhị phân (byte)(có http header ở trước nội dung)
-def read_file(file_url, header_type, Content_type, file_size):
+def read_file(file_url, header_type, Content_type, file_size, connection_type):
     f = open(file_url, 'rb')
     # Gán http header vào trước nội dung file
-    f_data = response_header(header_type, Content_type, file_size)
+    f_data = response_header(header_type, Content_type, file_size, connection_type)
     f_data += f.read()
     f.close()
     return f_data
@@ -74,12 +74,13 @@ def handle(client, addr):
         if not data: 
             print(f'[ CLIENT {addr} CLOSED THE CONNECTION ]\n')
             break
-        
+        #connection_type = 'keep-alive'
         # Nếu có data thì phân tích Request Từ Data nhận về
         print('* Request received:')
         request_line = data.split('\r\n')[0]
         request_method = request_line.split(' ')[0]
         request_url = (request_line.split(' ')[1]).strip('/')
+        connection_type = (data.split('Connection: ')[1]).split('\n')[0]
 
         print(f'    -Client: {addr}')
         #print(f'-Data: \n{data}')
@@ -103,7 +104,7 @@ def handle(client, addr):
             elif (request_url.split('/')[0] == 'css'):
                 url = file_path + request_url
                 Content_type = 'text/css'
-                header_type = '200'
+                header_type = '200'         
             elif request_url == 'favicon.ico':
                 url = file_path + request_url
                 Content_type = 'image/x-icon'
@@ -159,13 +160,14 @@ def handle(client, addr):
         print(f'    -File size: {file_size}\n')
         
         #SendBackData (nhị phân) là dữ liệu đọc từ hàm read_file (bao gồm response_header và nội dung file đọc tương ứng)  
-        send_Back_Data = read_file(url,header_type, Content_type, file_size)
+        send_Back_Data = read_file(url,header_type, Content_type, file_size, connection_type)
         
         #Gửi nội dung data đã đọc lại cho client
         client.send(send_Back_Data)
         
     #Đóng Kết Nối Client
     client.close()
+
 
 # == 1. KẾT NỐI == 
 # == 2. QUẢN LÝ KẾT NỐI. ==
@@ -182,6 +184,7 @@ def start_server():
         #Thread dùng để xử lý nhiều connection cùng 1 lúc
         thread = threading.Thread(target= handle, args=(connection, address))
         thread.start()
+        #thread.join()
     
-if __name__ == '__main__':
+if __name__ == '__main__':  
     start_server()
