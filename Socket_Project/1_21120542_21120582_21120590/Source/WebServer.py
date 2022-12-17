@@ -81,7 +81,6 @@ def handle(client, addr):
         request_method = request_line.split(' ')[0]
         request_url = (request_line.split(' ')[1]).strip('/')
         connection_type = (data.split('Connection: ')[1]).split('\n')[0]
-
         print(f'    -Client: {addr}')
         #print(f'-Data: \n{data}')
         print(f'    -Request line: {request_line}')
